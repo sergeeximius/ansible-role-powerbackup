@@ -1,0 +1,61 @@
+---
+- name: Copy powerbackup script
+  ansible.builtin.copy:
+    src: powerbackup
+    dest: /usr/local/sbin/powerbackup
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Copy powerbackup_rotate script
+  ansible.builtin.copy:
+    src: powerbackup_rotate
+    dest: /usr/local/sbin/powerbackup_rotate
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Create config directory
+  ansible.builtin.file:
+    path: /etc/powerbackup
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create tasks directorys
+  ansible.builtin.file:
+    path: "/etc/powerbackup/{{ item.name }}"
+    state: directory
+    mode: '0644'
+    owner: root
+    group: root
+  with_items: "{{ powerbackup_tasks }}"
+
+- name: Create tasks include file
+  ansible.builtin.template:
+    src: "include.j2"
+    dest: "/etc/powerbackup/{{ item.name }}/include"
+    mode: '0644'
+    owner: root
+    group: root
+  with_items: "{{ powerbackup_tasks }}"
+
+- name: Create tasks exclude file
+  ansible.builtin.template:
+    src: "exclude.j2"
+    dest: "/etc/powerbackup/{{ item.name }}/exclude"
+    mode: '0644'
+    owner: root
+    group: root
+  with_items: "{{ powerbackup_tasks }}"
+  when:
+    - item.exclude_dir is defined
+    - item.exclude_dir | length > 0
+
+- name: Creates powerbackup cronjob
+  ansible.builtin.cron:
+    minute: "5"
+    hour: "1"
+    name: "Backup files"
+    job: "cd {{ powerbackup_destination_dir }} && powerbackup 2>&1 | tee -a {{ powerbackup_destination_dir }}/backup.log"

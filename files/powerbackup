@@ -1,0 +1,73 @@
+#!/bin/bash
+# Author: Alex Efros <powerman-asdf@yandex.ru>, 2008, 2012
+# License: Public Domain
+#
+# powerbackup: Simple and flexible incremental backup
+#
+# Documentation available at http://powerman.name/soft/powerbackup.html
+
+VERSION="0.1.4"
+
+unset LANG
+TIMEFORMAT=$'%R'
+
+cfg="/etc/powerbackup/"
+now=$( date +%Y%m%d_%H%M%S )
+touch "$cfg/log.filter"
+
+die() { echo "$0: $@" >&2; exit 1; }
+
+
+if [ "$#" -gt 0 ]; then
+    tasks="$@"
+else
+    tasks=$( find "$cfg" -mindepth 1 -maxdepth 1 -type d \
+        -exec basename {} \; | sort )
+    [ -n "$tasks" ] || die "no tasks found in $cfg"
+fi
+
+for task in $tasks; do
+    # Initialize
+    d="$cfg/$task"
+    [ -d "$d" ] || die "no such directory: $d"
+    printf "%-40s" "Backuping $task ..."
+    opt=(--atime-preserve=system -c)
+    # Feature: custom tar & archive hooks
+    tar="/bin/tar"
+    [ -x "$cfg/tar" ] && tar="$cfg/tar"
+    [ -x   "$d/tar" ] && tar="$d/tar"
+    archive="/bin/gzip"
+    [ -x "$cfg/archive" ] && archive="$cfg/archive"
+    [ -x   "$d/archive" ] && archive="$d/archive"
+    # Feature: exclude file list
+    [ -f "$d/exclude" ] && opt+=(--no-wildcards-match-slash -X "$d/exclude")
+    # Feature: do incremental (level 2) backup if possible
+    snap="$task.snap"
+    if [ -f "$snap" ]; then
+        cp "$snap" "$snap.tmp"
+        snap="$snap.tmp"
+        type="incr"
+    else
+        type="full"
+    fi
+    opt+=(-g "$snap")
+    # Create archive, saving errors and statistics
+    fname="$task.$type.$now.tar"
+    opt+=(-f "$fname")
+    [ -s "$d/include" ] || die "no such (or empty) file: $d/include"
+    stat=$({ time {
+	IFS=$'\n'
+        $tar "${opt[@]}" $(< "$d/include" )
+        stat -c "%s" "$fname" || echo "?"
+        [ -f "$fname" ] && $archive "$fname" || echo "tar/archive failed" >&2
+        } 2>"$task.log"
+    } 2>&1)
+    # Show progress, statistics and errors
+    # WORKAROUND:   looks like tar when used with -g show some errors twice,
+    #               so we have to use `sort -u` to get rid of duplicates
+    printf "%10s bytes, %s sec\n" $stat
+    grep -v -f "$cfg/log.filter" "$task.log" | sort -u >&2
+    # Cleanup
+    [ "$type" = "incr" ] && rm "$snap"
+    rm "$task.log"
+done
