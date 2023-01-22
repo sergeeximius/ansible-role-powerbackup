@@ -58,7 +58,7 @@
     minute: "5"
     hour: "1"
     name: "Backup files"
-    job: "cd {{ powerbackup_destination_dir }} && powerbackup 2>&1 | tee -a {{ powerbackup_destination_dir }}/backup.log"
+    job: "cd {{ powerbackup_destination_dir }} && /usr/local/sbin/powerbackup 2>&1 | tee -a {{ powerbackup_destination_dir }}/backup.log"
 
 - name: Create backup destination directory
   ansible.builtin.file:
