@@ -19,7 +19,7 @@
   ansible.builtin.file:
     path: /etc/powerbackup
     state: directory
-    mode: '0755'
+    mode: 0755
     owner: root
     group: root
 
@@ -27,7 +27,7 @@
   ansible.builtin.file:
     path: "/etc/powerbackup/{{ item.name }}"
     state: directory
-    mode: '0644'
+    mode: 0755
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -36,7 +36,7 @@
   ansible.builtin.template:
     src: "include.j2"
     dest: "/etc/powerbackup/{{ item.name }}/include"
-    mode: '0644'
+    mode: 0644
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -45,7 +45,7 @@
   ansible.builtin.template:
     src: "exclude.j2"
     dest: "/etc/powerbackup/{{ item.name }}/exclude"
-    mode: '0644'
+    mode: 0644
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -64,6 +64,6 @@
   ansible.builtin.file:
     path: "{{ powerbackup_destination_dir }}"
     state: directory
-    mode: '0644'
+    mode: 0755
     owner: root
     group: root
