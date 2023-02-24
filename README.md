@@ -10,18 +10,19 @@ None
 
 Role Variables
 --------------
-powerbackup_tasks [_list_] - directories list for backup tasks 
-  name [_string_] - task name 
-  include_dir [_string_] - directory for backup in the task 
-powerbackup_destination_dir [_string_] - destination directory for the backups 
-powerbackup_fullbackup_periodically [daily|weekly(default)|monthly] - Crontab special time specification nickname 
+powerbackup_tasks [_list_] - directories list for backup tasks  
+- &ndash; name [_string_] - task name  
+- include_dir [_string_] - directory for backup in the task  
+
+powerbackup_destination_dir [_string_] - destination directory for the backups  
+powerbackup_fullbackup_periodically [_daily|weekly(default)|monthly_] - Crontab special time specification nickname  
 
 Dependencies
 ------------
 
 None
 
-Example Playbook
+Example
 ----------------
 
 requirements.yml
@@ -31,6 +32,7 @@ requirements.yml
           scm: git
           name: sergeeximius.powerbackup
 ```
+playbook.yml
 ```
     - hosts: servers
       vars:
