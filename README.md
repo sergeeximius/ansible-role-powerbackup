@@ -3,6 +3,8 @@ Ansible role for powerbackup script
 
 This code is used to set up a backup system using Ansible. It copies two scripts (powerbackup and powerbackup_rotate) to the /usr/local/sbin directory and sets the owner and group to root. It then creates a config directory at /etc/powerbackup, as well as tasks directories for each item in the powerbackup_tasks list. It also creates an include file and an exclude file for each item in the powerbackup_tasks list, if one is defined. Finally, it creates two cronjobs - one to run backup files every day at 1:05am, and another to run a full backup periodically (weekly by default). It also creates a destination directory for the backups at powerbackup_destination_dir.
 
+![Ansible Lint](https://github.com/sergeeximius/ansible-role-powerbackup/workflows/Ansible%20Lint/badge.svg)
+
 Requirements
 ------------
 
@@ -10,12 +12,12 @@ None
 
 Role Variables
 --------------
-powerbackup_tasks [_list_] - directories list for backup tasks  
-- &ndash; name [_string_] - task name  
-- include_dir [_string_] - directory for backup in the task  
+powerbackup_tasks [_list_] - directories list for backup tasks
+- &ndash; name [_string_] - task name
+- include_dir [_string_] - directory for backup in the task
 
-powerbackup_destination_dir [_string_] - destination directory for the backups  
-powerbackup_fullbackup_periodically [_daily|weekly(default)|monthly_] - Crontab special time specification nickname  
+powerbackup_destination_dir [_string_] - destination directory for the backups
+powerbackup_fullbackup_periodically [_daily|weekly(default)|monthly_] - Crontab special time specification nickname
 
 Dependencies
 ------------
@@ -44,7 +46,7 @@ playbook.yml
             include_dir: "/home/site2/data/www/"
         powerbackup_fullbackup_periodically: "weekly"
       roles:
-         - role: ansible-role-powerbackup
+         - role: sergeeximius.powerbackup
 ```
 License
 -------

@@ -3,7 +3,7 @@
   ansible.builtin.copy:
     src: powerbackup
     dest: /usr/local/sbin/powerbackup
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
@@ -11,7 +11,7 @@
   ansible.builtin.copy:
     src: powerbackup_rotate
     dest: /usr/local/sbin/powerbackup_rotate
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
@@ -19,7 +19,7 @@
   ansible.builtin.file:
     path: /etc/powerbackup
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
@@ -27,7 +27,7 @@
   ansible.builtin.file:
     path: "/etc/powerbackup/{{ item.name }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -36,7 +36,7 @@
   ansible.builtin.template:
     src: "include.j2"
     dest: "/etc/powerbackup/{{ item.name }}/include"
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -45,7 +45,7 @@
   ansible.builtin.template:
     src: "exclude.j2"
     dest: "/etc/powerbackup/{{ item.name }}/exclude"
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
   with_items: "{{ powerbackup_tasks }}"
@@ -62,14 +62,14 @@
 
 - name: Creates powerbackup cronjob for full backup
   ansible.builtin.cron:
-    special_time: "{{ powerbackup_fullbackup_periodically | defaults('weekly')}}"
+    special_time: "{{ powerbackup_fullbackup_periodically | default('weekly') }}"
     name: "Next run powerbackup create full backup"
-    job: "find {{ powerbackup_destination_dir }} --name "*.snap" -delete"
+    job: "find {{ powerbackup_destination_dir }} -name *.snap -delete"
 
 - name: Create backup destination directory
   ansible.builtin.file:
     path: "{{ powerbackup_destination_dir }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
