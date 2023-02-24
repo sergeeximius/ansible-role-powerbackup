@@ -1,32 +1,49 @@
-Role Name
+Ansible role for powerbackup script
 =========
 
-A brief description of the role goes here.
+This code is used to set up a backup system using Ansible. It copies two scripts (powerbackup and powerbackup_rotate) to the /usr/local/sbin directory and sets the owner and group to root. It then creates a config directory at /etc/powerbackup, as well as tasks directories for each item in the powerbackup_tasks list. It also creates an include file and an exclude file for each item in the powerbackup_tasks list, if one is defined. Finally, it creates two cronjobs - one to run backup files every day at 1:05am, and another to run a full backup periodically (weekly by default). It also creates a destination directory for the backups at powerbackup_destination_dir.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None
 
 Role Variables
 --------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+powerbackup_tasks [_list_] - directories list for backup tasks 
+  name [_string_] - task name 
+  include_dir [_string_] - directory for backup in the task 
+powerbackup_destination_dir [_string_] - destination directory for the backups 
+powerbackup_fullbackup_periodically [daily|weekly(default)|monthly] - Crontab special time specification nickname 
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
+requirements.yml
+```
+    roles:
+      - src: https://github.com/sergeeximius/ansible-role-powerbackup.git
+          scm: git
+          name: sergeeximius.powerbackup
+```
+```
     - hosts: servers
+      vars:
+        powerbackup_destination_dir: "/mnt/s3fs/files"
+        powerbackup_tasks:
+          - name: site1
+            include_dir: "/home/site1/data/www/"
+          - name: site2
+            include_dir: "/home/site2/data/www/"
+        powerbackup_fullbackup_periodically: "weekly"
       roles:
-         - { role: username.rolename, x: 42 }
-
+         - role: ansible-role-powerbackup
+```
 License
 -------
 

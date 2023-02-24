@@ -60,6 +60,12 @@
     name: "Backup files"
     job: "cd {{ powerbackup_destination_dir }} && /usr/local/sbin/powerbackup 2>&1 | tee -a {{ powerbackup_destination_dir }}/backup.log"
 
+- name: Creates powerbackup cronjob for full backup
+  ansible.builtin.cron:
+    special_time: "{{ powerbackup_fullbackup_periodically | defaults('weekly')}}"
+    name: "Next run powerbackup create full backup"
+    job: "find {{ powerbackup_destination_dir }} --name "*.snap" -delete"
+
 - name: Create backup destination directory
   ansible.builtin.file:
     path: "{{ powerbackup_destination_dir }}"
