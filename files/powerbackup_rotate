@@ -14,8 +14,8 @@ EOF
 }
 
 backup() {
-	FULLLST=($(ls $DIR|grep "$JOB\.full"|sort))
-	INCRLST=($(ls $DIR|grep "$JOB\.incr"|sort))
+	FULLLST=($(ls $DIR|egrep "^$JOB\.full"|sort))
+	INCRLST=($(ls $DIR|egrep "^$JOB\.incr"|sort))
 	echo "full backups need save: $FULLHIS	in store ${#FULLLST[@]}"
 	echo "incr backups need save: $INCRHIS	in store ${#INCRLST[@]}"
 
