@@ -15,6 +15,14 @@
     owner: root
     group: root
 
+- name: Create powerbackup_rotate.sh wrapper
+  ansible.builtin.template:
+    src: powerbackup_rotate.sh.j2
+    dest: /opt/powerbackup_rotate.sh
+    mode: "0755"
+    owner: root
+    group: root
+
 - name: Create config directory
   ansible.builtin.file:
     path: /etc/powerbackup
@@ -52,6 +60,13 @@
   when:
     - item.exclude_dir is defined
     - item.exclude_dir | length > 0
+
+- name: Creates powerbackup rotate cronjob
+  ansible.builtin.cron:
+    minute: "5"
+    hour: "0"
+    name: "Rotate backup files"
+    job: "/opt/powerbackup_rotate.sh 2>&1 | tee -a {{ powerbackup_destination_dir }}/backup_rotate.log"
 
 - name: Creates powerbackup cronjob
   ansible.builtin.cron:
