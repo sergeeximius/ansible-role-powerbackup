@@ -1,0 +1,32 @@
+#!/bin/bash
+###
+#
+# it's binding for powerbackup_rotate script
+#
+###
+  set -x
+POWERBACKUP_CONF_DIR="/etc/powerbackup/"
+BACKUP_STORE_DIR="{{ powerbackup_destination_dir }}"
+FULLHIS={{ powerbackup_full_history }}
+INCRHIS=7
+FULLBACKUPDAY=0 # IGNORE, SEE CRONTAB
+###
+pwbr_init()
+{
+  echo "$(date +%Y%m%d_%H%M%S) : Starting backup rotation script ..."
+  POWERBACKUP_JOB_LIST=$(find $POWERBACKUP_CONF_DIR -mindepth 1 -type d -exec basename -- {} \;)
+  echo "$(date +%Y%m%d_%H%M%S) : JOBLIST: $POWERBACKUP_JOB_LIST"
+  for JOB in $POWERBACKUP_JOB_LIST
+  do
+  echo "$(date +%Y%m%d_%H%M%S) : JOB: $JOB"
+    powerbackup_rotate \
+      --archive-dir=$BACKUP_STORE_DIR \
+      --job=$JOB \
+      --full-backup-day=$FULLBACKUPDAY \
+      --full-history=$FULLHIS \
+      --incr-history=$INCRHIS
+  done
+  set +x
+  echo "$(date +%Y%m%d_%H%M%S) : Finish backup rotation script ..."
+}
+pwbr_init
