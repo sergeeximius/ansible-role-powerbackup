@@ -1,1 +1,7 @@
+{% if item.exclude_dir is string %}
 {{ item.exclude_dir }}
+{% else %}
+{% for directory in item.exclude_dir %}
+{{ directory }}
+{% endfor %}
+{% endif %}

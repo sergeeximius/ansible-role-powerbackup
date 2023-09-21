@@ -1,1 +1,7 @@
+{% if item.include_dir is string %}
 {{ item.include_dir }}
+{% else %}
+{% for directory in item.include_dir %}
+{{ directory }}
+{% endfor %}
+{% endif %}
